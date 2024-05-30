@@ -1,6 +1,9 @@
+use std::ops;
+
 #[cfg(test)]
 mod test;
 
+#[derive(Clone)]
 struct Bigint {
     #[allow(dead_code)]
     sign: bool,
@@ -27,5 +30,26 @@ impl Bigint {
         str += self.number[0].to_string().as_str();
 
         str
+    }
+}
+
+impl ops::Add<Bigint> for Bigint {
+    type Output = Bigint;
+
+    fn add(self, rhs: Bigint) -> Self::Output {
+        if self.sign != rhs.sign {
+            panic!("no implmentation");
+        };
+
+        if self.number.len() < rhs.number.len() {
+            return rhs.add(self);
+        };
+
+        let mut ret: Bigint = self.clone();
+        for (i, num) in rhs.number.iter().enumerate() {
+            ret.number[i] += num;
+        }
+
+        ret
     }
 }
