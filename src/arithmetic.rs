@@ -12,11 +12,14 @@ struct Bigint {
 }
 
 impl Bigint {
+    const DIGIT: usize = 9;
+    const UPPER_BOUND: u64 = 10_u64.pow(Bigint::DIGIT as u32);
+
     #[allow(dead_code)]
     fn from_int(n: i32) -> Bigint {
         Bigint {
             sign: n >= 0,
-            number: vec![n.abs() as u64],
+            number: vec![n.abs() as u64, 0],
         }
     }
 
@@ -27,9 +30,37 @@ impl Bigint {
             false => String::from("-"),
         };
 
-        str += self.number[0].to_string().as_str();
-
+        for (i, num) in self.number.clone().iter().rev().enumerate() {
+            if i == 0 {
+                continue;
+            }
+            if i == 1 {
+                str += num.to_string().as_str();
+            } else {
+                str += format!("{:0>1$}", num, Bigint::DIGIT).as_str();
+            }
+        }
         str
+    }
+
+    fn modify(&mut self) {
+        let mut i: usize = 0;
+        while i < self.number.len() {
+            if self.number[i] >= Bigint::UPPER_BOUND {
+                let div = self.number[i] / Bigint::UPPER_BOUND;
+                self.number[i] %= Bigint::UPPER_BOUND;
+                self.number[i+1] += div;
+
+                if let Some(num) = self.number.last() {
+                    if *num != 0 {
+                        self.number.push(0);
+                        println!("pushed");
+                    }
+                }
+            }
+
+            i += 1;
+        }
     }
 }
 
@@ -50,6 +81,7 @@ impl ops::Add<Bigint> for Bigint {
             ret.number[i] += num;
         }
 
+        ret.modify();
         ret
     }
 }
