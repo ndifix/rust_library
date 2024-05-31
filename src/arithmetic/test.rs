@@ -47,3 +47,13 @@ fn add_nsmall_nsmall() {
     let result = lhs + rhs;
     assert_eq!(result.to_string(), "-300000");
 }
+
+#[test]
+fn add_pbig() {
+    let bi = Bigint::from_int(2_000_000_100);
+    let mut result = bi.clone();
+    for _ in 0..5 {
+        result = result.clone() + bi.clone();
+    }
+    assert_eq!(result.to_string(), "12000000600");
+}
