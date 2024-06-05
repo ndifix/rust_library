@@ -4,9 +4,15 @@ use std::ops;
 mod test;
 
 #[derive(Clone)]
+enum Sign {
+    Positive,
+    Negative,
+}
+
+#[derive(Clone)]
 struct Bigint {
     #[allow(dead_code)]
-    sign: bool,
+    sign: Sign,
     #[allow(dead_code)]
     number: Vec<u64>,
 }
@@ -17,8 +23,14 @@ impl Bigint {
 
     #[allow(dead_code)]
     fn from_int(n: i32) -> Bigint {
+        let sign = if n >= 0 {
+            Sign::Positive
+        } else {
+            Sign::Negative
+        };
+
         Bigint {
-            sign: n >= 0,
+            sign,
             number: vec![n.abs() as u64, 0],
         }
     }
@@ -26,8 +38,8 @@ impl Bigint {
     #[allow(dead_code)]
     fn to_string(&self) -> String {
         let mut str = match self.sign {
-            true => String::new(),
-            false => String::from("-"),
+            Sign::Positive => String::new(),
+            Sign::Negative => String::from("-"),
         };
 
         for (i, num) in self.number.clone().iter().rev().enumerate() {
@@ -86,11 +98,11 @@ impl ops::Add<Bigint> for Bigint {
     type Output = Bigint;
 
     fn add(self, rhs: Bigint) -> Self::Output {
-        match (self.sign, rhs.sign) {
-            (true, true)   => self.add_positive_positive(&rhs),
-            (true, false)  => panic!("no implmentation"),
-            (false, true)  => panic!("no implmentation"),
-            (false, false) => self.add_negative_negative(&rhs),
+        match (&self.sign, &rhs.sign) {
+            (Sign::Positive, Sign::Positive) => self.add_positive_positive(&rhs),
+            (Sign::Positive, Sign::Negative) => panic!("no implmentation"),
+            (Sign::Negative, Sign::Positive) => panic!("no implmentation"),
+            (Sign::Negative, Sign::Negative) => self.add_negative_negative(&rhs),
         }
     }
 }
