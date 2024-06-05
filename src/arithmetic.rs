@@ -62,18 +62,10 @@ impl Bigint {
             i += 1;
         }
     }
-}
 
-impl ops::Add<Bigint> for Bigint {
-    type Output = Bigint;
-
-    fn add(self, rhs: Bigint) -> Self::Output {
-        if self.sign != rhs.sign {
-            panic!("no implmentation");
-        };
-
+    fn add_positive_positive(&self, rhs: &Bigint) -> Bigint {
         if self.number.len() < rhs.number.len() {
-            return rhs.add(self);
+            return rhs.add_positive_positive(self);
         };
 
         let mut ret: Bigint = self.clone();
@@ -83,5 +75,22 @@ impl ops::Add<Bigint> for Bigint {
 
         ret.modify();
         ret
+    }
+
+    fn add_negative_negative(&self, rhs: &Bigint) -> Bigint {
+        self.add_positive_positive(rhs)
+    }
+}
+
+impl ops::Add<Bigint> for Bigint {
+    type Output = Bigint;
+
+    fn add(self, rhs: Bigint) -> Self::Output {
+        match (self.sign, rhs.sign) {
+            (true, true)   => self.add_positive_positive(&rhs),
+            (true, false)  => panic!("no implmentation"),
+            (false, true)  => panic!("no implmentation"),
+            (false, false) => self.add_negative_negative(&rhs),
+        }
     }
 }
