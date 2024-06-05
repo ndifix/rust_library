@@ -57,3 +57,17 @@ fn add_pbig() {
     }
     assert_eq!(result.to_string(), "12000000600");
 }
+
+#[test]
+fn sign() {
+    let pos = Bigint::from_int(123_456);
+    let neg = -pos;
+    assert_eq!(neg.to_string(), "-123456");
+}
+
+#[test]
+fn sign2() {
+    let neg = Bigint::from_int(-123_456);
+    let pos = -neg;
+    assert_eq!(pos.to_string(), "123456");
+}

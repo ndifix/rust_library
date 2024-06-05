@@ -106,3 +106,17 @@ impl ops::Add<Bigint> for Bigint {
         }
     }
 }
+
+impl ops::Neg for Bigint {
+    type Output = Bigint;
+
+    fn neg(self) -> Self::Output {
+        let mut bg = self.clone();
+        bg.sign = match &bg.sign {
+            Sign::Positive => Sign::Negative,
+            Sign::Negative => Sign::Positive,
+        };
+
+        bg
+    }
+}
