@@ -120,3 +120,18 @@ impl ops::Neg for Bigint {
         bg
     }
 }
+
+impl PartialEq for Sign {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (Sign::Positive, Sign::Positive) => true,
+            (Sign::Positive, Sign::Negative) => false,
+            (Sign::Negative, Sign::Positive) => false,
+            (Sign::Negative, Sign::Negative) => true,
+        }
+    }
+
+    fn ne(&self, other: &Self) -> bool {
+        !self.eq(other)
+    }
+}
