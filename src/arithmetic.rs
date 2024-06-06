@@ -159,3 +159,53 @@ impl PartialEq for Bigint {
         return false;
     }
 }
+
+impl PartialOrd for Bigint {
+    fn gt(&self, other: &Self) -> bool {
+        if self.sign == Sign::Positive && other.sign == Sign::Negative {
+            return true;
+        };
+        if self.sign == Sign::Negative && other.sign == Sign::Positive {
+            return false;
+        };
+        if self.sign == Sign::Negative && other.sign == Sign::Negative {
+            return (-other.clone()).gt(&-self.clone());
+        };
+
+        if self.number.len() != other.number.len() {
+            return self.number.len() > other.number.len()
+        };
+
+        for (s, o) in self.number.iter().zip(other.number.iter()) {
+            if s != o {
+                return s > o;
+            }
+        };
+
+        return false;
+    }
+
+    fn lt(&self, other: &Self) -> bool {
+        other.ge(self)
+    }
+
+    fn ge(&self, other: &Self) -> bool {
+        self.eq(other) || self.gt(other)
+    }
+
+    fn le(&self, other: &Self) -> bool {
+        self.eq(other) || self.lt(other)
+    }
+
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        if self.gt(other) {
+            Some(std::cmp::Ordering::Greater)
+        } else if self.eq(other) {
+            Some(std::cmp::Ordering::Equal)
+        } else if self.lt(other) {
+            Some(std::cmp::Ordering::Less)
+        } else {
+            None
+        }
+    }
+}
