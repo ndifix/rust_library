@@ -135,3 +135,27 @@ impl PartialEq for Sign {
         !self.eq(other)
     }
 }
+
+impl PartialEq for Bigint {
+    fn eq(&self, other: &Self) -> bool {
+        !self.ne(other)
+    }
+
+    fn ne(&self, other: &Self) -> bool {
+        if self.sign != other.sign {
+            return true;
+        };
+
+        if self.number.len() != other.number.len() {
+            return  true;
+        };
+
+        for i in 0..self.number.len() {
+            if self.number[i] != other.number[i] {
+                return true;
+            }
+        };
+
+        return false;
+    }
+}
