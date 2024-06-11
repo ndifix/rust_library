@@ -92,6 +92,54 @@ impl Bigint {
     fn add_negative_negative(&self, rhs: &Bigint) -> Bigint {
         self.add_positive_positive(rhs)
     }
+
+    fn add_positive_negative(&self, rhs: &Bigint) -> Bigint {
+        if *self < -rhs.clone() {
+            return -(-rhs.clone()).add_positive_negative(&-self.clone());
+        }
+
+        // すべての位について lhs >= rhs の状態に変形する無名関数
+        let ready_to_sub = |lhs: &mut Bigint, rhs: &Bigint| {
+            // lhs.number[i] >= rhs.number[i] の状態に変形する無名関数
+            let ready_to_sub_impl = |lhs: &mut Bigint, rhs: &Bigint, i: usize| {
+                if i >= rhs.number.len() {
+                    return;
+                }
+                if lhs.number[i] >= rhs.number[i] {
+                    return;
+                }
+
+                for j in i+1..rhs.number.len() {
+                    if lhs.number[j] > rhs.number[j] {
+                        for k in j..i+1 {
+                            lhs.number[k] -= 1;
+                            lhs.number[k-1] += Bigint::UPPER_BOUND;
+                        }
+
+                        return;
+                    }
+                }
+            };
+
+            for (i, _) in lhs.clone().number.iter().enumerate() {
+                ready_to_sub_impl(lhs, rhs, i);
+            }
+        };
+
+        let mut lhs = self.clone();
+        ready_to_sub(&mut lhs, rhs);
+
+        for (i, num) in lhs.number.iter_mut().enumerate() {
+            if i >= rhs.number.len() {
+                break;
+            }
+
+            *num -= rhs.number[i];
+        }
+
+        lhs.modify();
+        lhs
+    }
 }
 
 impl ops::Add<Bigint> for Bigint {
@@ -100,8 +148,8 @@ impl ops::Add<Bigint> for Bigint {
     fn add(self, rhs: Bigint) -> Self::Output {
         match (&self.sign, &rhs.sign) {
             (Sign::Positive, Sign::Positive) => self.add_positive_positive(&rhs),
-            (Sign::Positive, Sign::Negative) => panic!("no implmentation"),
-            (Sign::Negative, Sign::Positive) => panic!("no implmentation"),
+            (Sign::Positive, Sign::Negative) => self.add_positive_negative(&rhs),
+            (Sign::Negative, Sign::Positive) => rhs.add_positive_negative(&self),
             (Sign::Negative, Sign::Negative) => self.add_negative_negative(&rhs),
         }
     }

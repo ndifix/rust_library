@@ -23,21 +23,19 @@ fn add_psmall_psmall() {
 }
 
 #[test]
-#[should_panic]
 fn add_nsmall_psmall() {
     let lhs = Bigint::from_int(-100_000);
     let rhs = Bigint::from_int(200_000);
     let result = lhs + rhs;
-    assert_eq!(result.to_string(), "300000");
+    assert_eq!(result.to_string(), "100000");
 }
 
 #[test]
-#[should_panic]
 fn add_psmall_nsmall() {
     let lhs = Bigint::from_int(100_000);
     let rhs = Bigint::from_int(-200_000);
     let result = lhs + rhs;
-    assert_eq!(result.to_string(), "300000");
+    assert_eq!(result.to_string(), "-100000");
 }
 
 #[test]
