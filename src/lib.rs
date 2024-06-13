@@ -14,3 +14,4 @@ mod tests {
 }
 
 mod arithmetic;
+mod pdf;
